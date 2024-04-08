@@ -18,7 +18,7 @@
     If a live cell has more than three live neighbors, it dies due to overcrowding.
 # Reproduction: 
     If a dead cell has exactly three live neighbors, it becomes alive in the next generation, simulating reproduction.
-
+# Result
     These rules are applied simultaneously to all cells in the grid, creating successive generations of cells. This leads to various interesting patterns and behaviors, including stable patterns, oscillators, gliders, and even complex structures like spaceships.
 
     The Game of Life is not only of interest for its simplicity and unpredictability but also because it demonstrates emergent complexity. Even though the rules are straightforward, they can give rise to intricate and fascinating patterns that seem to exhibit life-like behavior, hence the name "Game of Life." It has applications in various fields, including computer science, biology, and artificial life research, serving as a rich source of study for complex systems and emergent phenomena.
