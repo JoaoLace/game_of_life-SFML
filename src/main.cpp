@@ -1,6 +1,6 @@
 #include "../include/game.h"
 game Game;
 int main (){
-    Game.run();
+    Game.test();
     return 0;
 }
