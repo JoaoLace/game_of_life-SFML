@@ -1,9 +1,13 @@
 #include "mylib.h"
-
+typedef struct{
+    sf::RectangleShape *sprite;
+    bool state;
+}cell;
 class game{
 public:
     void run();
     void test();
+    ~game();
 private:
     sf::RenderWindow *window;
     bool gameRunning;
@@ -11,15 +15,18 @@ private:
     void init();
     void initVariables();
     void initWindow();
+    void initCells();
+    
 
     void update();
     void updateEvent();
+    void updateCells();
     
     void render();
+    void renderGrid();
 
     char gride[10][10];
-    // '*' -> alive
-    // ' ' -> dead
+
     void renderGride();
     void initGride();
     void updateGride();
@@ -31,4 +38,11 @@ private:
     bool cell_isAlive(int x, int y);
 
     int neighbors_alive(int x, int y);
+    int neighbors_aliveCell(int x, int y);
+
+    std::vector<cell> *cells;
+
+    sf::Vector2u get_WindowSize();
 };
+
+

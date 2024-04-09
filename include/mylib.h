@@ -4,10 +4,11 @@
 #include <SFML/System.hpp>
 #include <iostream>
 #include <time.h>
+#include <vector>
 
 // Consts
 #define WIDTH 800
-#define HEIGHT 600
+#define HEIGHT 800
 #define BLACK sf::Color::Black
 #define WHITE sf::Color::White
 #define DEAD 0
@@ -17,4 +18,7 @@
 #define cell_dead ' '
 #define gride_width 100
 #define gride_height 100
-
+#define cell_width 40
+#define cell_height 40
+#define alive true
+#define dead false

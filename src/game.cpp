@@ -8,19 +8,44 @@ void game::run(){
     }
 }
 // INIT FUNCS
+game::~game(){
+    delete cells;
+}
 void game::init(){
     initVariables();
     initWindow();
+    initCells();
 }
 void game::initVariables(){
     gameRunning = true;
+    cells = new std::vector<cell>();
 }
 void game::initWindow(){
     window = new sf::RenderWindow(window_WH,"Game of Life - SFML");
 }
+void game::initCells(){
+    for (size_t i = 0; i < get_WindowSize().x/cell_width; i++)
+        {
+                for (size_t l = 0; l < get_WindowSize().y/cell_height;l++)
+                {
+                    cell temp_cell;
+                    temp_cell.sprite = new sf::RectangleShape (sf::Vector2f(cell_width, cell_height));
+                    temp_cell.sprite->setPosition(sf::Vector2f(cell_width*i, cell_height*l));
+                    if (rand() % 2 == DEAD){
+                            temp_cell.sprite->setFillColor(BLACK);
+                            temp_cell.state = dead;
+                        }else{
+                            temp_cell.sprite->setFillColor(WHITE);
+                            temp_cell.state = alive;
+                        }
+                    cells->push_back(temp_cell);
+                }
+        }
+}
 // UPDATE FUNCS
 void game::update(){
     updateEvent();
+    //updateCells();
 }
 void game::updateEvent(){
     sf::Event event;
@@ -34,11 +59,49 @@ void game::updateEvent(){
                
         }
 }
+void game::updateCells() {
+    for (size_t i = 0; i < cells->size(); i++) {
+        cell &currentCell = cells->at(i);
+        int x = i % (get_WindowSize().x / cell_width); 
+        int y = i / (get_WindowSize().y / cell_height);
+
+        int aliveNeighbors = neighbors_aliveCell(x, y);
+
+        if (currentCell.state == alive) {
+            if (aliveNeighbors < 2){
+                currentCell.state = dead;
+                currentCell.sprite->setFillColor(BLACK);
+            }
+            else if (aliveNeighbors == 2 or aliveNeighbors == 3){
+                currentCell.state = alive;
+                currentCell.sprite->setFillColor(WHITE);
+            }
+            else if (aliveNeighbors > 3){
+                currentCell.state = dead;
+                currentCell.sprite->setFillColor(BLACK);
+            }
+        } else {
+            if (aliveNeighbors == 3){
+                currentCell.state = alive;
+                currentCell.sprite->setFillColor(WHITE);
+            }
+        }
+    }
+}
+
 // RENDER FUNCS
 void game::render(){
     window->clear();
+    renderGrid();
     window->display();
 }
+void game::renderGrid(){
+    for (auto &x : *cells)
+        {
+            window->draw(*x.sprite);
+        }
+}
+// LOGIC FUNCS
 void game::test(){
     initGride();
     while (true)
@@ -47,7 +110,6 @@ void game::test(){
         renderGride();
     }
 }
-
 void game::renderGride(){
     sf::sleep(sf::seconds(0.5));
     system("clear");
@@ -141,4 +203,28 @@ int game::neighbors_alive(int x, int y) {
         }
     }
     return temp;
+}
+int game::neighbors_aliveCell(int x, int y) {
+    int temp = 0;
+    for (int dx = -1; dx <= 1; ++dx) {
+        for (int dy = -1; dy <= 1; ++dy) {
+            if (dx == 0 && dy == 0) {
+                continue;
+            }
+            int nx = x + dx;
+            int ny = y + dy;
+            if (nx >= 0 && nx < x && ny >= 0 && ny < y) {
+                if (cells->at(nx * (get_WindowSize().x / cell_width) + ny).state == alive) {
+                    temp++;
+                }
+            }
+        }
+    }
+    return temp;
+}
+
+
+// OTHERS  FUNCS
+sf::Vector2u game::get_WindowSize(){
+    return window->getSize();
 }
