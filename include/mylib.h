@@ -8,7 +8,7 @@
 
 // Consts
 #define WIDTH 800
-#define HEIGHT 800
+#define HEIGHT 600
 #define BLACK sf::Color::Black
 #define WHITE sf::Color::White
 #define DEAD 0
@@ -16,8 +16,8 @@
 #define window_WH sf::VideoMode(WIDTH,HEIGHT)
 #define cell_alive '*'
 #define cell_dead ' '
-#define gride_width 100
-#define gride_height 100
+#define gride_width 800/40
+#define gride_height 600/40
 #define cell_width 40
 #define cell_height 40
 #define alive true

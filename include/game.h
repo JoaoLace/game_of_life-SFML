@@ -2,6 +2,8 @@
 typedef struct{
     sf::RectangleShape *sprite;
     bool state;
+    int x;
+    int y;
 }cell;
 class game{
 public:
@@ -25,7 +27,7 @@ private:
     void render();
     void renderGrid();
 
-    char gride[10][10];
+    char gride[gride_width][gride_height];
 
     void renderGride();
     void initGride();
@@ -41,6 +43,8 @@ private:
     int neighbors_aliveCell(int x, int y);
 
     std::vector<cell> *cells;
+
+    int returnIndex(int x, int y);
 
     sf::Vector2u get_WindowSize();
 };

@@ -9,11 +9,15 @@ void game::run(){
 }
 // INIT FUNCS
 game::~game(){
-    delete cells;
+    if (!cells->empty())
+        {
+             delete cells;
+        }
 }
 void game::init(){
     initVariables();
     initWindow();
+    initGride();
     initCells();
 }
 void game::initVariables(){
@@ -38,6 +42,8 @@ void game::initCells(){
                             temp_cell.sprite->setFillColor(WHITE);
                             temp_cell.state = alive;
                         }
+                    temp_cell.x = i;
+                    temp_cell.y = l;
                     cells->push_back(temp_cell);
                 }
         }
@@ -45,7 +51,8 @@ void game::initCells(){
 // UPDATE FUNCS
 void game::update(){
     updateEvent();
-    //updateCells();
+    updateGride();
+    updateCells();
 }
 void game::updateEvent(){
     sf::Event event;
@@ -60,31 +67,44 @@ void game::updateEvent(){
         }
 }
 void game::updateCells() {
-    for (size_t i = 0; i < cells->size(); i++) {
-        cell &currentCell = cells->at(i);
-        int x = i % (get_WindowSize().x / cell_width); 
-        int y = i / (get_WindowSize().y / cell_height);
+    // for (size_t i = 0; i < cells->size(); i++) {
+    //     cell &currentCell = cells->at(i);
+    //     int x = i % (get_WindowSize().x / cell_width); 
+    //     int y = i / (get_WindowSize().y / cell_height);
 
-        int aliveNeighbors = neighbors_aliveCell(x, y);
+    //     int aliveNeighbors = neighbors_aliveCell(x, y);
 
-        if (currentCell.state == alive) {
-            if (aliveNeighbors < 2){
-                currentCell.state = dead;
-                currentCell.sprite->setFillColor(BLACK);
+    //     if (currentCell.state == alive) {
+    //         if (aliveNeighbors < 2){
+    //             currentCell.state = dead;
+    //             currentCell.sprite->setFillColor(BLACK);
+    //         }
+    //         else if (aliveNeighbors == 2 or aliveNeighbors == 3){
+    //             currentCell.state = alive;
+    //             currentCell.sprite->setFillColor(WHITE);
+    //         }
+    //         else if (aliveNeighbors > 3){
+    //             currentCell.state = dead;
+    //             currentCell.sprite->setFillColor(BLACK);
+    //         }
+    //     } else {
+    //         if (aliveNeighbors == 3){
+    //             currentCell.state = alive;
+    //             currentCell.sprite->setFillColor(WHITE);
+    //         }
+    //     }
+    // }
+    int index = 0;
+    for (size_t i = 0; i < gride_height; i++){
+        for (size_t l = 0; l < gride_width; l++){
+            if (gride[i][l] == ' '){
+                cells->at(index).sprite->setFillColor(BLACK);
+                cells->at(index).state = cell_dead;
+            }else if (gride[i][l] == '*'){
+                cells->at(index).sprite->setFillColor(WHITE);
+                cells->at(index).state = cell_alive;
             }
-            else if (aliveNeighbors == 2 or aliveNeighbors == 3){
-                currentCell.state = alive;
-                currentCell.sprite->setFillColor(WHITE);
-            }
-            else if (aliveNeighbors > 3){
-                currentCell.state = dead;
-                currentCell.sprite->setFillColor(BLACK);
-            }
-        } else {
-            if (aliveNeighbors == 3){
-                currentCell.state = alive;
-                currentCell.sprite->setFillColor(WHITE);
-            }
+            index++;
         }
     }
 }
@@ -92,6 +112,7 @@ void game::updateCells() {
 // RENDER FUNCS
 void game::render(){
     window->clear();
+    renderGride();
     renderGrid();
     window->display();
 }
@@ -111,7 +132,6 @@ void game::test(){
     }
 }
 void game::renderGride(){
-    sf::sleep(sf::seconds(0.5));
     system("clear");
     for (size_t i = 0; i < gride_height; ++i){
             for (size_t l = 0; l < gride_width; ++l){
@@ -124,7 +144,7 @@ void game::initGride(){
     unsigned int seed = static_cast<unsigned int>(time(nullptr));
     srand(seed);
     for (size_t i = 0; i < gride_height; ++i){
-            for (size_t l = 0; l < gride_height; ++l){
+            for (size_t l = 0; l < gride_width; ++l){
                     int temp = rand () % 2;
                         if (temp == 0){
                                 gride[i][l] = cell_dead;
@@ -204,27 +224,38 @@ int game::neighbors_alive(int x, int y) {
     }
     return temp;
 }
-int game::neighbors_aliveCell(int x, int y) {
-    int temp = 0;
-    for (int dx = -1; dx <= 1; ++dx) {
-        for (int dy = -1; dy <= 1; ++dy) {
-            if (dx == 0 && dy == 0) {
-                continue;
-            }
-            int nx = x + dx;
-            int ny = y + dy;
-            if (nx >= 0 && nx < x && ny >= 0 && ny < y) {
-                if (cells->at(nx * (get_WindowSize().x / cell_width) + ny).state == alive) {
-                    temp++;
-                }
-            }
-        }
-    }
-    return temp;
-}
+// int game::neighbors_aliveCell(int x, int y) {
+//     int temp = 0;
+//     for (int dx = -1; dx <= 1; ++dx) {
+//         for (int dy = -1; dy <= 1; ++dy) {
+//             if (dx == 0 && dy == 0) {
+//                 continue;
+//             }
+//             int nx = x + dx;
+//             int ny = y + dy;
+//             if (nx >= 0 && nx < x && ny >= 0 && ny < y) {
+//                 if (cells->at(nx * (get_WindowSize().x / cell_width) + ny).state == alive) {
+//                     temp++;
+//                 }
+//             }
+//         }
+//     }
+//     return temp;
+// }
 
 
 // OTHERS  FUNCS
 sf::Vector2u game::get_WindowSize(){
     return window->getSize();
+}
+
+int game::returnIndex(int x, int y){
+    int count = 0;
+    for (auto &temp : *cells){
+        if (temp.x == x and temp.y == y)
+            return count;
+        
+        count++;
+    }
+    return NULL;
 }
