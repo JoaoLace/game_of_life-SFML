@@ -35,7 +35,7 @@ void game::initCells(){
                     cell temp_cell;
                     temp_cell.sprite = new sf::RectangleShape (sf::Vector2f(cell_width, cell_height));
                     temp_cell.sprite->setPosition(sf::Vector2f(cell_width*i, cell_height*l));
-                    if (rand() % 2 == DEAD){
+                    if (gride[i][l] == cell_dead){
                             temp_cell.sprite->setFillColor(BLACK);
                             temp_cell.state = dead;
                         }else{
@@ -94,17 +94,15 @@ void game::updateCells() {
     //         }
     //     }
     // }
-    int index = 0;
     for (size_t i = 0; i < gride_height; i++){
         for (size_t l = 0; l < gride_width; l++){
             if (gride[i][l] == ' '){
-                cells->at(index).sprite->setFillColor(BLACK);
-                cells->at(index).state = cell_dead;
+                cells->at(returnIndex(i,l)).sprite->setFillColor(BLACK);
+                cells->at(returnIndex(i,l)).state = cell_dead;
             }else if (gride[i][l] == '*'){
-                cells->at(index).sprite->setFillColor(WHITE);
-                cells->at(index).state = cell_alive;
+                cells->at(returnIndex(i,l)).sprite->setFillColor(WHITE);
+                cells->at(returnIndex(i,l)).state = cell_alive;
             }
-            index++;
         }
     }
 }
@@ -116,11 +114,16 @@ void game::render(){
     renderGrid();
     window->display();
 }
-void game::renderGrid(){
-    for (auto &x : *cells)
-        {
-            window->draw(*x.sprite);
+void game::renderGrid() {
+    for (size_t i = 0; i < gride_height; ++i) {
+        for (size_t j = 0; j < gride_width; ++j) {
+            int index = returnIndex(i, j); 
+            if (index != -1) { 
+                cells->at(index).sprite->setPosition(sf::Vector2f(i*cell_height,j*cell_width));
+                window->draw(*cells->at(index).sprite); 
+            }
         }
+    }
 }
 // LOGIC FUNCS
 void game::test(){
@@ -143,6 +146,11 @@ void game::renderGride(){
 void game::initGride(){
     unsigned int seed = static_cast<unsigned int>(time(nullptr));
     srand(seed);
+    // for (size_t i = 0; i < gride_height; ++i){
+    //     for (size_t j = 0; j < gride_width; ++j){
+    //         gride[i][j] = cell_dead;
+    //     }}
+
     for (size_t i = 0; i < gride_height; ++i){
             for (size_t l = 0; l < gride_width; ++l){
                     int temp = rand () % 2;
@@ -155,6 +163,7 @@ void game::initGride(){
                 }
             std::cout << "\n";
         }
+    // gride[0][0] = cell_alive;
 }
 void game::updateGride(){
     for (size_t i = 0; i < gride_height; i++){
