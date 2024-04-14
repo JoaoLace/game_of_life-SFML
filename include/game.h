@@ -40,10 +40,9 @@ private:
     void updateGride();
     void updateClick(int x, int y);
 
-    bool underpopulation(int x, int y);
-    bool survival(int x, int y);
-    bool overcrowding(int x, int y);
-    bool reproduction(int x, int y);
+    bool underpopulation(int aliveNeighbors);
+    bool overcrowding(int aliveNeighbors);
+    bool reproduction(int aliveNeighbors);
     bool cell_isAlive(int x, int y);
     bool gameStarted;
 

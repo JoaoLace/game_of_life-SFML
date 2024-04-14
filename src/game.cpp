@@ -10,23 +10,28 @@ void game::run(){
         }}
 }
 void game::runGameStarted(){
-        text1.setString("Press 'p' to pause");
+        text1.setString("Press 'p' to pause - Press 'c' to clear ");
         sf::sleep(sf::seconds(0.3));
         update();
         render();
     }
 void game::runGameNotStarted(){
-    text1.setString("Press 'p' to start");
+    text1.setString("Press 'p' to start - Press 'c' to clear ");
         updateEvent();
         updateCells();
         render();
 }
 // INIT FUNCS
-game::~game(){
-    if (!cells->empty())
-        {
-             delete cells;
+game::~game() {
+    if (cells != nullptr) {
+        for (auto& cell : *cells) {
+            delete cell.sprite;
         }
+        delete cells;
+    }
+    if (window != nullptr) {
+        delete window;
+    }
 }
 void game::init(){
     initVariables();
@@ -84,73 +89,85 @@ void game::update(){
     updateGride();
     updateCells();
 }
-void game::updateEvent(){
+void game::updateEvent() {
     sf::Event event;
-        while (window->pollEvent(event))
-        {
-            if (event.type == sf::Event::Closed)
-                {
-                     window->close();
-                     gameRunning = false;
-                }
-            if (event.type == sf::Event::KeyPressed){
-                if (event.key.code == sf::Keyboard::P)
-                    gameStarted = true;
-                if (event.key.code == sf::Keyboard::C)
-                    clearGrid();
-                 }
-            if (!gameStarted){
-                if(event.type == sf::Event::MouseButtonPressed){
-                    if (event.mouseButton.button == sf::Mouse::Left){
-                            int x = event.mouseButton.x / cell_width;
-                            int y = event.mouseButton.y / cell_height;
-                            updateClick(x,y);
-                    }
-                }}
-            else if (gameStarted){
-                 if (event.mouseButton.button == sf::Mouse::Left){
-                            gameStarted = false;
-                    }
-            }
-            
-               
+    while (window->pollEvent(event)) {
+        if (event.type == sf::Event::Closed) {
+            window->close();
+            gameRunning = false;
         }
+        if (event.type == sf::Event::KeyPressed) {
+            if (event.key.code == sf::Keyboard::P) {
+                gameStarted = !gameStarted; 
+                text1.setString(gameStarted ? "Press 'p' to resume" : "Press 'p' to pause");
+            }
+            if (event.key.code == sf::Keyboard::C)
+                clearGrid();
+        }
+        if (!gameStarted) {
+            if (event.type == sf::Event::MouseButtonPressed) {
+                if (event.mouseButton.button == sf::Mouse::Left) {
+                    int x = event.mouseButton.x / cell_width;
+                    int y = event.mouseButton.y / cell_height;
+                    updateClick(x, y);
+                }
+            }
+        } else {
+
+        }
+    }
 }
+
 void game::updateCells() {
-    for (size_t i = 0; i < gride_width; i++){
-        for (size_t l = 0; l < gride_height; l++){
-            if (gride[i][l] == ' '){
-                cells->at(returnIndex(i,l)).sprite->setFillColor(WHITE);
-                cells->at(returnIndex(i,l)).state = cell_dead;
-            }else if (gride[i][l] == '*'){
-                cells->at(returnIndex(i,l)).sprite->setFillColor(BLACK);
-                cells->at(returnIndex(i,l)).state = cell_alive;
+    for (size_t i = 0; i < gride_width; i++) {
+        for (size_t j = 0; j < gride_height; j++) {
+            if (gride[i][j] == cell_dead) {
+                int index = returnIndex(i, j);
+                if (index != -1) {
+                    cells->at(index).sprite->setFillColor(WHITE);
+                    cells->at(index).sprite->setOutlineColor(BLACK);
+                    cells->at(index).state = cell_dead;
+                }
+            } else if (gride[i][j] == cell_alive) {
+                int index = returnIndex(i, j);
+                if (index != -1) {
+                    cells->at(index).sprite->setFillColor(BLACK);
+                    cells->at(index).sprite->setOutlineColor(WHITE);
+                    cells->at(index).state = cell_alive;
+                }
             }
         }
     }
 }
+
+
 void game::updateClick(int x, int y){
  if (x >= 0 && x < gride_width && y >= 0 && y < gride_height) {
+    // DEBUGING
         if (!cell_isAlive(x,y)){
-            std::cout << "Changing cell at position " << x << ", " << y << " from dead to alive\n";
-            std::cout << "\nCell at position " << x << ", " << y << "has " << neighbors_alive(x,y) << "\n";
-                if (neighbors_alive(x,y) == 3){
-                    std::cout << "\nReprodution()";
-                }
+            // std::cout << "Changing cell at position " << x << ", " << y << " from dead to alive\n";
+            // std::cout << "\nCell at position " << x << ", " << y << "has " << neighbors_alive(x,y) << "\n";
+
+            //     if (neighbors_alive(x,y) == 3){
+            //         std::cout << "\nReprodution()";
+            //     }
             gride[x][y] = cell_alive;
         } else if (cell_isAlive(x,y)){
-            std::cout << "Changing cell at position " << x << ", " << y << " from alive to dead\n";
-            std::cout << "\nCell at position " << x << ", " << y << " has " << neighbors_alive(x,y) << "\n";
+            // std::cout << "Changing cell at position " << x << ", " << y << " from alive to dead\n";
+            // std::cout << "\nCell at position " << x << ", " << y << " has " << neighbors_alive(x,y) << "\n";
+
             gride[x][y] = cell_dead;
         }
     } else {
-        std::cerr << "Error: Clicked position (" << x << ", " << y << ") is out of bounds!" << std::endl;
+        // std::cerr << "Error: Clicked position (" << x << ", " << y << ") is out of bounds!" << std::endl;
     }
+    // std::cout << "\nGride at position " << x << ", " << y << " is " << gride[x][y] << "\n";
+    // renderGride();
 }
 // RENDER FUNCS
 void game::render(){
     window->clear();
-    renderGride();
+    // renderGride();
     renderGrid();
     renderText();
     window->display();
@@ -178,23 +195,19 @@ void game::test(){
         renderGride();
     }
 }
-void game::renderGride(){
+void game::renderGride() {
     system("clear");
-    for (size_t i = 0; i < gride_width; ++i){
-            for (size_t l = 0; l < gride_height; ++l){
-                    std::cout << gride[i][l];
-                }
-            std::cout << "\n";
+    for (size_t j = 0; j < gride_height; ++j) {
+        for (size_t i = 0; i < gride_width; ++i) {
+            std::cout << gride[i][j];
         }
+        std::cout << "\n";
+    }
 }
+
 void game::initGride(){
     unsigned int seed = static_cast<unsigned int>(time(nullptr));
     srand(seed);
-    // for (size_t i = 0; i < gride_height; ++i){
-    //     for (size_t j = 0; j < gride_width; ++j){
-    //         gride[i][j] = cell_dead;
-    //     }}
-
     for (size_t i = 0; i < gride_width; ++i){
             for (size_t l = 0; l < gride_height; ++l){
                     int temp = rand () % 2;
@@ -209,47 +222,49 @@ void game::initGride(){
         }
     // gride[0][0] = cell_alive;
 }
-void game::updateGride(){
-    for (size_t i = 0; i < gride_width; i++){
-        for (size_t l = 0; l < gride_height; l++){
-            int aliveNeighbors = neighbors_alive(i, l);
-            if (cell_isAlive(i,l)) {
-                if (underpopulation(i,l))
-                    gride[i][l] = cell_dead;
-                else if (overcrowding(i,l))
-                    gride[i][l] = cell_dead;
+void game::updateGride() {
+    char newGride[gride_width][gride_height]; 
+
+    for (size_t i = 0; i < gride_width; i++) {
+        for (size_t j = 0; j < gride_height; j++) {
+            int aliveNeighbors = neighbors_alive(i, j);
+
+            if (cell_isAlive(i, j)) {
+                if (underpopulation(aliveNeighbors))
+                    newGride[i][j] = cell_dead;
+                else if (overcrowding(aliveNeighbors))
+                    newGride[i][j] = cell_dead;
+                else
+                    newGride[i][j] = cell_alive;
             } else {
-                if (aliveNeighbors == 3)
-                    gride[i][l] = cell_alive;
+                if (reproduction(aliveNeighbors))
+                    newGride[i][j] = cell_alive;
+                else
+                    newGride[i][j] = cell_dead;
             }
         }
     }
+
+    for (size_t i = 0; i < gride_width; i++) {
+        for (size_t j = 0; j < gride_height; j++) {
+            gride[i][j] = newGride[i][j];
+        }
+    }
 }
+
    
-bool game::underpopulation(int x, int y){
-    if (neighbors_alive(x,y) < 2)
-        return true;
-
-    return false;
+bool game::underpopulation(int aliveNeighbors) {
+    return aliveNeighbors < 2;
 }
-bool game::survival(int x, int y){
-    if (neighbors_alive(x,y) == 2 or neighbors_alive(x,y) == 3)
-        return true;
 
-    return false;
+bool game::overcrowding(int aliveNeighbors) {
+    return aliveNeighbors > 3;
 }
-bool game::overcrowding(int x, int y){
-    if (neighbors_alive(x,y) > 3)
-        return true;
 
-    return false;
+bool game::reproduction(int aliveNeighbors) {
+    return aliveNeighbors == 3;
 }
-bool game::reproduction(int x, int y){
-    if (neighbors_alive(x, y) == 3)
-        return true;
 
-    return false;
-}
 bool game::cell_isAlive(int x, int y){
     if (gride[x][y] == cell_alive){
         return true;
@@ -287,7 +302,7 @@ int game::returnIndex(int x, int y){
         
         count++;
     }
-    return NULL;
+    return -1;
 }
 void game::clearGrid(){
         for (size_t i = 0; i < gride_width; i++){

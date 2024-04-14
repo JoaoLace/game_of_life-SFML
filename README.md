@@ -24,9 +24,11 @@
     The Game of Life is not only of interest for its simplicity and unpredictability but also because it demonstrates emergent complexity. Even though the rules are straightforward, they can give rise to intricate and fascinating patterns that seem to exhibit life-like behavior, hence the name "Game of Life." It has applications in various fields, including computer science, biology, and artificial life research, serving as a rich source of study for complex systems and emergent phenomena.
 
     This project tries to apply the game of life idea with cpp and SFML.
-# Obs 
+# Observations
     You gonna have to change this to any font that you have (the location of it): 
         void game::initFont(){
              if (font.loadFromFile("/home/joao/Dev/cpp/TICTACTOE/fonts/JetBrainsMono-Bold-Italic.ttf"));
             }
         game.cpp line 53
+
+    I have no idea of why the program gives segmentation fault when its closed
