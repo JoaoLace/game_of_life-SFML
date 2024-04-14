@@ -13,12 +13,13 @@
 #define WHITE sf::Color::White
 #define DEAD 0
 #define ALIVE 1
-#define window_WH sf::VideoMode(WIDTH,HEIGHT)
+#define window_WH sf::VideoMode(WIDTH,HEIGHT + 45)
 #define cell_alive '*'
 #define cell_dead ' '
-#define gride_width 800/40
-#define gride_height 600/40
+#define gride_width 800/40 //20
+#define gride_height 600/40 //15
 #define cell_width 40
 #define cell_height 40
 #define alive true
 #define dead false
+#define textPos sf::Vector2f(0,615)
